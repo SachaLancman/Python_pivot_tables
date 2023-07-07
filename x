@@ -133,6 +133,9 @@ ws_report1.Columns("D:E").ColumnWidth = 30
 # Create a slicer for "Linkage_Execution"
 slicer_cache = wb.SlicerCaches.Add(pt1, "Credit_pty_trf")
 slicer = slicer_cache.Slicers.Add(ws_report1)
+slicer.Style = "SlicerStyleLight2"
+slicer.Height = 240
+slicer.Left = 800
 
 # Create the second pivot table
 ws_report2 = wb.Worksheets.Add()
@@ -210,6 +213,9 @@ ws_report2.Columns("D:E").ColumnWidth = 30
 # Create a slicer for "Linkage_Execution"
 slicer_cache = wb.SlicerCaches.Add(pt2, "Credit_pty_trf")
 slicer = slicer_cache.Slicers.Add(ws_report2)
+slicer.Style = "SlicerStyleLight2"
+slicer.Height = 240
+slicer.Left = 800
 
 # Create the third pivot table
 ws_report3 = wb.Worksheets.Add()
@@ -283,6 +289,9 @@ ws_report3.Columns("D:E").ColumnWidth = 30
 # Create a slicer for "Linkage_Execution"
 slicer_cache = wb.SlicerCaches.Add(pt3, "Credit_pty_trf")
 slicer = slicer_cache.Slicers.Add(ws_report3)
+slicer.Style = "SlicerStyleLight2"
+slicer.Height = 240
+slicer.Left = 800
 
 # Rename the sheets
 ws_data.Name = 'table'
