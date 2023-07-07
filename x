@@ -47,9 +47,18 @@ for field in currency_fields:
     column_index = df_4.columns.get_loc(field) + 1  # Get the column index (1-based)
     ws_data.Columns(column_index).NumberFormat = "_($* #,##0.00_);_($* (#,##0.00);_($* -??_);_(@_)"
 
-# Auto-fit the columns in the first sheet
+# Auto-fit the columns in the Table sheet
 ws_data.UsedRange.Columns.AutoFit()
 
+# Get the last row index in the Table sheet
+last_row = ws_data.Cells(ws_data.Rows.Count, 1).End(-4162).Row  # -4162 represents xlUp
+
+# Sum the currency fields in the Table sheet
+currency_sum_row = ws_data.Cells(last_row + 1, 1).EntireRow
+currency_sum_row.Value = ['Total'] + [f"=SUM({field}2:{field}{last_row})" for field in currency_fields]
+
+# Apply number format to the currency sum row
+currency_sum_row.NumberFormat = "_($* #,##0.00_);_($* (#,##0.00);_($* -??_);_(@_)"
 # Clear pivot tables on the Report tab
 def clear_pts(ws):
     for pt in ws.PivotTables():
