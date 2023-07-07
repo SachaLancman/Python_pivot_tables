@@ -130,7 +130,7 @@ pt1.TableStyle2 = "PivotStyleDark3"
 # Adjust column widths for the first pivot table
 ws_report1.Columns("D:E").ColumnWidth = 30
 
-# Create a slicer for "Linkage_Execution"
+# Create a slicer for "Credit_pty_trf"
 slicer_cache = wb.SlicerCaches.Add(pt1, "Credit_pty_trf")
 slicer = slicer_cache.Slicers.Add(ws_report1)
 slicer.Style = "SlicerStyleLight2"
@@ -210,7 +210,7 @@ pt2.TableStyle2 = "PivotStyleDark3"
 # Adjust column widths for the second pivot table
 ws_report2.Columns("D:E").ColumnWidth = 30
 
-# Create a slicer for "Linkage_Execution"
+# Create a slicer for "Credit_pty_trf"
 slicer_cache = wb.SlicerCaches.Add(pt2, "Credit_pty_trf")
 slicer = slicer_cache.Slicers.Add(ws_report2)
 slicer.Style = "SlicerStyleLight2"
@@ -286,7 +286,7 @@ pt3.TableStyle2 = "PivotStyleDark3"
 # Adjust column widths for the second pivot table
 ws_report3.Columns("D:E").ColumnWidth = 30
 
-# Create a slicer for "Linkage_Execution"
+# Create a slicer for "Credit_pty_trf"
 slicer_cache = wb.SlicerCaches.Add(pt3, "Credit_pty_trf")
 slicer = slicer_cache.Slicers.Add(ws_report3)
 slicer.Style = "SlicerStyleLight2"
