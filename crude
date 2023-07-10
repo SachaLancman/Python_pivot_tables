@@ -150,6 +150,7 @@ slicer_cache = wb.SlicerCaches.Add(pt1, "Month_pty_trf")
 slicer = slicer_cache.Slicers.Add(ws_report1)
 slicer.Left = 800
 slicer.Height = 160
+slicer.Top = 230
 
 # Create the second pivot table
 ws_report2 = wb.Worksheets.Add()
@@ -236,6 +237,7 @@ slicer_cache = wb.SlicerCaches.Add(pt2, "Month_pty_trf")
 slicer = slicer_cache.Slicers.Add(ws_report2)
 slicer.Left = 800
 slicer.Height = 160
+slicer.Top = 230
 
 # Rename the sheets
 ws_data.Name = 'table'
