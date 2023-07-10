@@ -24,8 +24,8 @@ df_3 = pd.merge(df, df_2, on='id_counter', how="inner")
 df_4 = df_3[(df_3['entity'] == 'ATMI') | (df_3['entity'] == 'TTMC')]
 
 # Add a column for month names
-df_4.loc[:, 'Month_pty_trf'] = pd.to_datetime(df_4['Credit_pty_trf']).dt.month.map({1: 'January', 2: 'February', 3: 'March', 4: 'April', 5: 'May', 6: 'June', 7: 'July', 8: 'August', 9: 'September', 10: 'October', 11: 'November', 12: 'December'})
-
+credit_pty_trf_index = df_4.columns.get_loc("Credit_pty_trf")
+df_4.insert(credit_pty_trf_index + 1, "Month", pd.to_datetime(df_4['Credit_pty_trf']).dt.month)
 
 # Save table to Excel
 df_4.to_excel('auto_crude_july.xlsx', index=False)
