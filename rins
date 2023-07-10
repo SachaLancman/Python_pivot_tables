@@ -136,6 +136,7 @@ slicer = slicer_cache.Slicers.Add(ws_report1)
 slicer.Style = "SlicerStyleLight2"
 slicer.Height = 240
 slicer.Left = 800
+slicer.Top = 100
 
 # Create the second pivot table
 ws_report2 = wb.Worksheets.Add()
@@ -216,6 +217,7 @@ slicer = slicer_cache.Slicers.Add(ws_report2)
 slicer.Style = "SlicerStyleLight2"
 slicer.Height = 240
 slicer.Left = 800
+slicer.Top = 100
 
 # Create the third pivot table
 ws_report3 = wb.Worksheets.Add()
@@ -292,6 +294,7 @@ slicer = slicer_cache.Slicers.Add(ws_report3)
 slicer.Style = "SlicerStyleLight2"
 slicer.Height = 240
 slicer.Left = 800
+slicer.Top = 100
 
 # Rename the sheets
 ws_data.Name = 'table'
