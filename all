@@ -160,6 +160,14 @@ slicer.Left = 800
 slicer.Height = 115
 slicer.Top = 505
 
+# Create a slicer for "entity"
+slicer_cache = wb.SlicerCaches.Add(pt1, "entity")
+slicer = slicer_cache.Slicers.Add(ws_report1)
+slicer.Style = "SlicerStyleLight5"
+slicer.Left = 800
+slicer.Height = 75
+slicer.Top = 20
+
 # Create the second pivot table
 ws_report2 = wb.Worksheets.Add()
 clear_pts(ws_report2)
@@ -256,6 +264,14 @@ slicer.Style = "SlicerStyleLight5"
 slicer.Left = 800
 slicer.Height = 115
 slicer.Top = 505
+
+# Create a slicer for "entity"
+slicer_cache = wb.SlicerCaches.Add(pt2, "entity")
+slicer = slicer_cache.Slicers.Add(ws_report2)
+slicer.Style = "SlicerStyleLight5"
+slicer.Left = 800
+slicer.Height = 75
+slicer.Top = 20
 
 # Rename the sheets
 ws_data.Name = 'table'
