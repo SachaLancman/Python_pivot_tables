@@ -23,6 +23,9 @@ df_3 = pd.merge(df, df_2, on='id_counter', how="inner")
 
 df_4 = df_3[(df_3['entity'] == 'ATMI') | (df_3['entity'] == 'TTMC')]
 
+# Add a column for month names
+df_4['Month_credit_pty_trf'] = pd.to_datetime(df_4['Credit_pty_trf']).dt.strftime('%B')
+
 # Save table to Excel
 df_4.to_excel('auto_crude_july.xlsx', index=False)
 
