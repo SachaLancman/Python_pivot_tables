@@ -74,6 +74,7 @@ def insert_pt_field_set1(pt):
     field_filters['Credit_Term'] = pt.PivotFields("Credit_Term")
     field_filters['Trader'] = pt.PivotFields("Trader")
     field_filters['Month_pty_trf'] = pt.PivotFields("Month_pty_trf")
+    field_filters['profit_center'] = pt.PivotFields("profit_center")
 
     field_rows = {}
     field_rows['Name_full'] = pt.PivotFields("Name_full")
@@ -103,6 +104,9 @@ def insert_pt_field_set1(pt):
 
     field_filters['Month_pty_trf'].Orientation = 3  # xlPageField
     field_filters['Month_pty_trf'].Position = 6
+
+    field_filters['profit_center'].Orientation = 3  # xlPageField
+    field_filters['profit_center'].Position = 7
 
     # Insert row field
     field_rows['Name_full'].Orientation = 1
@@ -183,6 +187,7 @@ def insert_pt_field_set2(pt):
     field_filters['Credit_Term'] = pt.PivotFields("Credit_Term")
     field_filters['Trader'] = pt.PivotFields("Trader")
     field_filters['Month_pty_trf'] = pt.PivotFields("Month_pty_trf")
+    field_filters['profit_center'] = pt.PivotFields("profit_center")
 
     field_rows = {}
     field_rows['Name_full'] = pt.PivotFields("Name_full")
@@ -211,6 +216,9 @@ def insert_pt_field_set2(pt):
 
     field_filters['Month_pty_trf'].Orientation = 3  # xlPageField
     field_filters['Month_pty_trf'].Position = 6
+
+    field_filters['profit_center'].Orientation = 3  # xlPageField
+    field_filters['profit_center'].Position = 7
 
     # Insert row field
     field_rows['Name_full'].Orientation = 1
