@@ -13,7 +13,7 @@ engine = sqlalchemy.create_engine(connection_string)
 # Get Data From Med_bi
 sql_query = "SELECT id_counter, entity, profit_center, Deal#, Quality, Linkage_Execution, Deal_date, Credit_due_date, Credit_pty_trf, " \
             "Linkage#, Credit_Term, Trader, [sale_due_amt $], [purchase_due_amt $],[sale_due_amt $] - [purchase_due_amt $] AS [NET], [Pay_risk $ (pty -8d)] " \
-            "FROM MED_BI.dbo.credit_phy_deal WHERE profit_center = 'CRUDE' AND Credit_pty_trf BETWEEN '2023-07-01' AND '2023-07-31'"
+            "FROM MED_BI.dbo.credit_phy_deal WHERE profit_center = 'CRUDE' AND Credit_pty_trf BETWEEN '2023-07-01' AND '2023-12-31'"
 df = pd.read_sql(sql_query, engine)
 
 sql_query_2 = "SELECT id_counter, Name_full FROM MED_BI.dbo.COUNTERPARTY"
@@ -25,7 +25,7 @@ df_4 = df_3[(df_3['entity'] == 'ATMI') | (df_3['entity'] == 'TTMC')]
 
 # Add a column for month names
 credit_pty_trf_index = df_4.columns.get_loc("Credit_pty_trf")
-df_4.insert(credit_pty_trf_index + 1, "Month", pd.to_datetime(df_4['Credit_pty_trf']).dt.month)
+df_4.insert(credit_pty_trf_index + 1, "Month_pty_trf", pd.to_datetime(df_4['Credit_pty_trf']).dt.month)
 
 # Save table to Excel
 df_4.to_excel('auto_crude_july.xlsx', index=False)
@@ -73,6 +73,7 @@ def insert_pt_field_set1(pt):
     field_filters['entity'] = pt.PivotFields("entity")
     field_filters['Credit_Term'] = pt.PivotFields("Credit_Term")
     field_filters['Trader'] = pt.PivotFields("Trader")
+    field_filters['Month_pty_trf'] = pt.PivotFields("Month_pty_trf")
 
     field_rows = {}
     field_rows['Name_full'] = pt.PivotFields("Name_full")
@@ -99,6 +100,9 @@ def insert_pt_field_set1(pt):
 
     field_filters['Trader'].Orientation = 3  # xlPageField
     field_filters['Trader'].Position = 5
+
+    field_filters['Month_pty_trf'].Orientation = 3  # xlPageField
+    field_filters['Month_pty_trf'].Position = 6
 
     # Insert row field
     field_rows['Name_full'].Orientation = 1
@@ -140,10 +144,10 @@ slicer.Top = 100
 slicer.Height = 140
 
 # Create a slicer for "Credit_pty_trf"
-slicer_cache = wb.SlicerCaches.Add(pt1, "Credit_pty_trf")
+slicer_cache = wb.SlicerCaches.Add(pt1, "Month_pty_trf")
 slicer = slicer_cache.Slicers.Add(ws_report1)
 slicer.Left = 800
-slicer.Height = 365
+slicer.Height = 160
 
 # Create the second pivot table
 ws_report2 = wb.Worksheets.Add()
@@ -159,6 +163,7 @@ def insert_pt_field_set2(pt):
     field_filters['entity'] = pt.PivotFields("entity")
     field_filters['Credit_Term'] = pt.PivotFields("Credit_Term")
     field_filters['Trader'] = pt.PivotFields("Trader")
+    field_filters['Month_pty_trf'] = pt.PivotFields("Month_pty_trf")
 
     field_rows = {}
     field_rows['Name_full'] = pt.PivotFields("Name_full")
@@ -184,6 +189,9 @@ def insert_pt_field_set2(pt):
 
     field_filters['Trader'].Orientation = 3  # xlPageField
     field_filters['Trader'].Position = 5
+
+    field_filters['Month_pty_trf'].Orientation = 3  # xlPageField
+    field_filters['Month_pty_trf'].Position = 6
 
     # Insert row field
     field_rows['Name_full'].Orientation = 1
@@ -222,10 +230,10 @@ slicer.Top = 100
 slicer.Height = 140
 
 # Create a slicer for "Credit_pty_trf"
-slicer_cache = wb.SlicerCaches.Add(pt2, "Credit_pty_trf")
+slicer_cache = wb.SlicerCaches.Add(pt2, "Month_pty_trf")
 slicer = slicer_cache.Slicers.Add(ws_report2)
 slicer.Left = 800
-slicer.Height = 365
+slicer.Height = 160
 
 # Rename the sheets
 ws_data.Name = 'table'
