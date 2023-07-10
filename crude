@@ -11,10 +11,12 @@ connection_string = f"mssql+pyodbc://{server}:{port}/{database}?trusted_connecti
 engine = sqlalchemy.create_engine(connection_string)
 
 # Get Data From Med_bi
-sql_query = "SELECT id_counter, entity, profit_center, Deal#, Quality, Linkage_Execution, Deal_date, Credit_due_date, Credit_pty_trf, " \
+sql_query = "SELECT id_counter, entity, profit_center, Deal#, Quality, Linkage_Execution, Deal_date, date_expo, Credit_due_date, Credit_pty_trf, " \
             "Linkage#, Credit_Term, Trader, [sale_due_amt $], [purchase_due_amt $],[sale_due_amt $] - [purchase_due_amt $] AS [NET], [Pay_risk $ (pty -8d)] " \
-            "FROM MED_BI.dbo.credit_phy_deal WHERE profit_center = 'CRUDE' AND Credit_pty_trf BETWEEN '2023-07-01' AND '2023-12-31'"
+            "FROM MED_BI.dbo.credit_phy_deal WHERE Credit_pty_trf BETWEEN '2023-07-01' AND '2023-12-31' AND date_expo = (SELECT MAX(date_expo) FROM MED_BI.dbo.credit_phy_deal)"
 df = pd.read_sql(sql_query, engine)
+
+df = df[df['profit_center'] == 'CRUDE']
 
 sql_query_2 = "SELECT id_counter, Name_full FROM MED_BI.dbo.COUNTERPARTY"
 df_2 = pd.read_sql(sql_query_2, engine)
