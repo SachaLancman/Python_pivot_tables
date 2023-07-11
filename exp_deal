@@ -13,7 +13,7 @@ engine = sqlalchemy.create_engine(connection_string)
 # Get Data From Med_bi
 sql_query = "SELECT id_counter, entity, profit_center, Deal#, Quality, Linkage_Execution, date_expo, Deal_date, Credit_due_date, Credit_pty_trf, " \
             "Linkage#, Credit_Term, Trader, [sale_due_amt $], [purchase_due_amt $],[sale_due_amt $] - [purchase_due_amt $] AS [NET], [Pay_risk $ (pty -8d)], [pay_risk_unsecured (pty-8d)] " \
-            "FROM MED_BI.dbo.credit_phy_deal WHERE Credit_pty_trf BETWEEN '2023-07-01' AND '2023-12-31'"
+            "FROM MED_BI.dbo.credit_phy_deal WHERE date_expo >= DATEADD(year, -1, GETDATE()) AND date_expo <= CAST (GETDATE() AS DATE)"
 df = pd.read_sql(sql_query, engine)
 
 sql_query_2 = "SELECT id_counter, Name_full FROM MED_BI.dbo.COUNTERPARTY"
