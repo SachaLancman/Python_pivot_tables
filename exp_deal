@@ -12,7 +12,7 @@ engine = sqlalchemy.create_engine(connection_string)
 
 # Get Data From Med_bi
 sql_query = "SELECT id_counter, entity, profit_center, Deal#, Quality, Linkage_Execution, date_expo, Deal_date, Credit_due_date, Credit_pty_trf, " \
-            "Linkage#, Credit_Term, Trader, [sale_due_amt $], [purchase_due_amt $],[sale_due_amt $] - [purchase_due_amt $] AS [NET], [Pay_risk $ (pty -8d)] " \
+            "Linkage#, Credit_Term, Trader, [sale_due_amt $], [purchase_due_amt $],[sale_due_amt $] - [purchase_due_amt $] AS [NET], [Pay_risk $ (pty -8d)], [pay_risk_unsecured (pty-8d)] " \
             "FROM MED_BI.dbo.credit_phy_deal WHERE Credit_pty_trf BETWEEN '2023-07-01' AND '2023-12-31'"
 df = pd.read_sql(sql_query, engine)
 
@@ -24,17 +24,17 @@ df_3 = pd.merge(df, df_2, on='id_counter', how="inner")
 df_4 = df_3[(df_3['entity'] == 'ATMI') | (df_3['entity'] == 'TTMC')]
 
 # Group by days (date_expo) and Name_full, find min and max pay_risk_unsecured
-grouped_df = df_4.groupby(['date_expo', 'Name_full'])['pay_risk_unsecured (pty -8d)'].agg(['min', 'max']).reset_index()
+grouped_df = df_4.groupby(['date_expo', 'Name_full'])['pay_risk_unsecured (pty-8d)'].agg(['min', 'max']).reset_index()
 
 # Save grouped data to Excel
-grouped_df.to_excel('grouped_data.xlsx', index=False)
+grouped_df.to_excel('exposure_deal.xlsx', index=False)
 
 # Create the Excel application object
 xlApp = win32.Dispatch('Excel.Application')
 xlApp.Visible = True
 
 # Open the workbook
-wb = xlApp.Workbooks.Open(r'grouped_data.xlsx')
+wb = xlApp.Workbooks.Open(r'C:\Users\SLANCM\PycharmProjects\python_Project_1\exposure_deal.xlsx')
 ws_data = wb.Worksheets(1)
 
 # Convert the table to a real Excel table
@@ -68,9 +68,6 @@ pt = pt_cache.CreatePivotTable(ws_report.Range("B3"), "PivotTable1")
 field_rows = {}
 field_rows['Name_full'] = pt.PivotFields("Name_full")
 
-field_columns = {}
-field_columns['date_expo'] = pt.PivotFields("date_expo")
-
 field_values = {}
 field_values['Min_pay_risk_unsecured'] = pt.PivotFields("min")
 field_values['Max_pay_risk_unsecured'] = pt.PivotFields("max")
@@ -79,17 +76,13 @@ field_values['Max_pay_risk_unsecured'] = pt.PivotFields("max")
 field_rows['Name_full'].Orientation = 1
 field_rows['Name_full'].Position = 1
 
-# Insert column field
-field_columns['date_expo'].Orientation = 2
-field_columns['date_expo'].Position = 1
-
 # Insert values fields
 field_values['Min_pay_risk_unsecured'].Orientation = 4
-field_values['Min_pay_risk_unsecured'].Function = -4136
+field_values['Min_pay_risk_unsecured'].Function = -4139
 field_values['Min_pay_risk_unsecured'].NumberFormat = "_($* #,##0.00_);_($* (#,##0.00);_($* -??_);_(@_)"
 
 field_values['Max_pay_risk_unsecured'].Orientation = 4
-field_values['Max_pay_risk_unsecured'].Function = -4139
+field_values['Max_pay_risk_unsecured'].Function = -4136
 field_values['Max_pay_risk_unsecured'].NumberFormat = "_($* #,##0.00_);_($* (#,##0.00);_($* -??_);_(@_)"
 
 # Adjust column widths
