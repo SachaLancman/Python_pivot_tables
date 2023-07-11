@@ -34,7 +34,7 @@ xlApp = win32.Dispatch('Excel.Application')
 xlApp.Visible = True
 
 # Open the workbook
-wb = xlApp.Workbooks.Open(r'exposure_deal.xlsx')
+wb = xlApp.Workbooks.Open(r'C:\Users\SLANCM\PycharmProjects\python_Project_1\exposure_deal.xlsx')
 ws_data = wb.Worksheets(1)
 
 # Convert the table to a real Excel table
@@ -72,7 +72,8 @@ field_rows = {}
 field_rows['Name_full'] = pt.PivotFields("Name_full")
 
 field_values = {}
-field_values['Sum_pay_risk_unsecured'] = pt.PivotFields("pay_risk_unsecured (pty-8d)")
+field_values['Max_pay_risk_unsecured'] = pt.PivotFields("pay_risk_unsecured (pty-8d)")
+field_values['Min_pay_risk_unsecured'] = pt.PivotFields("pay_risk_unsecured (pty-8d)")
 
 # Insert filter fields
 field_filters['date_expo'].Orientation = 3  # xlPageField
@@ -83,23 +84,22 @@ field_rows['Name_full'].Orientation = 1
 field_rows['Name_full'].Position = 1
 
 # Insert values field
-field_values['Sum_pay_risk_unsecured'].Orientation = 4
-field_values['Sum_pay_risk_unsecured'].Function = -4157
-field_values['Sum_pay_risk_unsecured'].NumberFormat = "_($* #,##0.00_);_($* (#,##0.00);_($* -??_);_(@_)"
+field_values['Max_pay_risk_unsecured'].Orientation = 4
+field_values['Max_pay_risk_unsecured'].Function = -4139
+field_values['Max_pay_risk_unsecured'].NumberFormat = "_($* #,##0.00_);_($* (#,##0.00);_($* -??_);_(@_)"
 
-# Change pivot table summary function for Min and Max
-field_values['Sum_pay_risk_unsecured'].Function = -4139  # Min
-field_values['Sum_pay_risk_unsecured'].DataField.Subtotals = [False, False, False, True, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False]
-field_values['Sum_pay_risk_unsecured'].DataField.Function = 2  # Min
-
-field_values['Sum_pay_risk_unsecured'].Function = -4136  # Max
-field_values['Sum_pay_risk_unsecured'].DataField.Subtotals = [False, False, False, False, True, False, False, False, False, False, False, False, False, False, False, False, False, False, False]
-field_values['Sum_pay_risk_unsecured'].DataField.Function = 4  # Max
+field_values['Min_pay_risk_unsecured'].Orientation = 4
+field_values['Min_pay_risk_unsecured'].Function = -4136
+field_values['Min_pay_risk_unsecured'].NumberFormat = "_($* #,##0.00_);_($* (#,##0.00);_($* -??_);_(@_)"
 
 # Adjust column widths
-ws_report.Columns("C:D").ColumnWidth = 15
+ws_report.Columns("C:D").ColumnWidth = 30
+
+# Change pivot table style for the first pivot table
+pt.TableStyle2 = "PivotStyleDark8"
 
 # Rename the sheet
+ws_data.Name = 'table'
 ws_report.name = 'PivotTable'
 
 # Save the modified workbook
