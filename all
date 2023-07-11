@@ -153,7 +153,7 @@ slicer_cache = wb.SlicerCaches.Add(pt1, "Linkage_Execution")
 slicer = slicer_cache.Slicers.Add(ws_report1)
 slicer.Style = "SlicerStyleLight5"
 slicer.Left = 800
-slicer.Height = 240
+slicer.Height = 265
 slicer.Top = 260
 
 # Create a slicer for "profit_center"
@@ -162,7 +162,7 @@ slicer = slicer_cache.Slicers.Add(ws_report1)
 slicer.Style = "SlicerStyleLight5"
 slicer.Left = 800
 slicer.Height = 115
-slicer.Top = 505
+slicer.Top = 530
 
 # Create a slicer for "entity"
 slicer_cache = wb.SlicerCaches.Add(pt1, "entity")
@@ -262,7 +262,7 @@ slicer_cache = wb.SlicerCaches.Add(pt2, "Linkage_Execution")
 slicer = slicer_cache.Slicers.Add(ws_report2)
 slicer.Style = "SlicerStyleLight5"
 slicer.Left = 800
-slicer.Height = 240
+slicer.Height = 265
 slicer.Top = 260
 
 # Create a slicer for "profit_center"
@@ -271,7 +271,7 @@ slicer = slicer_cache.Slicers.Add(ws_report2)
 slicer.Style = "SlicerStyleLight5"
 slicer.Left = 800
 slicer.Height = 115
-slicer.Top = 505
+slicer.Top = 530
 
 # Create a slicer for "entity"
 slicer_cache = wb.SlicerCaches.Add(pt2, "entity")
