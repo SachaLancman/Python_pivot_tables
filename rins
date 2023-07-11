@@ -150,7 +150,7 @@ slicer.Top = 100
 slicer_cache = wb.SlicerCaches.Add(pt1, "Year_and_RIN")
 slicer = slicer_cache.Slicers.Add(ws_report1)
 slicer.Style = "SlicerStyleLight2"
-slicer.Height = 325
+slicer.Height = 290
 slicer.Left = 800
 slicer.Top = 245
 
@@ -243,7 +243,7 @@ slicer.Top = 100
 slicer_cache = wb.SlicerCaches.Add(pt2, "Year_and_RIN")
 slicer = slicer_cache.Slicers.Add(ws_report2)
 slicer.Style = "SlicerStyleLight2"
-slicer.Height = 325
+slicer.Height = 290
 slicer.Left = 800
 slicer.Top = 245
 
