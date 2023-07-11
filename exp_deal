@@ -23,8 +23,8 @@ df_3 = pd.merge(df, df_2, on='id_counter', how="inner")
 
 df_4 = df_3[(df_3['entity'] == 'ATMI') | (df_3['entity'] == 'TTMC')]
 
-# Group by days (date_expo) and Name_full, find min and max pay_risk_unsecured
-grouped_df = df_4.groupby(['date_expo', 'Name_full'])['pay_risk_unsecured (pty-8d)'].agg(['min', 'max']).reset_index()
+# Group by date_expo and Name_full, calculate sum of pay_risk_unsecured
+grouped_df = df_4.groupby(['date_expo', 'Name_full'])['pay_risk_unsecured (pty-8d)'].sum().reset_index()
 
 # Save grouped data to Excel
 grouped_df.to_excel('exposure_deal.xlsx', index=False)
@@ -34,7 +34,7 @@ xlApp = win32.Dispatch('Excel.Application')
 xlApp.Visible = True
 
 # Open the workbook
-wb = xlApp.Workbooks.Open(r'C:\Users\SLANCM\PycharmProjects\python_Project_1\exposure_deal.xlsx')
+wb = xlApp.Workbooks.Open(r'exposure_deal.xlsx')
 ws_data = wb.Worksheets(1)
 
 # Convert the table to a real Excel table
@@ -45,7 +45,7 @@ table = ws_data.ListObjects.Add(1, table_range, 1, 1)
 table.TableStyle = "TableStyleMedium15"
 
 # Format the currency fields in the first sheet
-currency_fields = ['min', 'max']
+currency_fields = ['pay_risk_unsecured (pty-8d)']
 for field in currency_fields:
     column_index = grouped_df.columns.get_loc(field) + 1  # Get the column index (1-based)
     ws_data.Columns(column_index).NumberFormat = "_($* #,##0.00_);_($* (#,##0.00);_($* -??_);_(@_)"
@@ -66,24 +66,23 @@ pt = pt_cache.CreatePivotTable(ws_report.Range("B3"), "PivotTable1")
 
 # Insert pivot table field settings
 field_rows = {}
+field_rows['date_expo'] = pt.PivotFields("date_expo")
 field_rows['Name_full'] = pt.PivotFields("Name_full")
 
 field_values = {}
-field_values['Min_pay_risk_unsecured'] = pt.PivotFields("min")
-field_values['Max_pay_risk_unsecured'] = pt.PivotFields("max")
+field_values['Sum_pay_risk_unsecured'] = pt.PivotFields("pay_risk_unsecured (pty-8d)")
 
-# Insert row field
+# Insert row fields
+field_rows['date_expo'].Orientation = 1
+field_rows['date_expo'].Position = 1
+
 field_rows['Name_full'].Orientation = 1
-field_rows['Name_full'].Position = 1
+field_rows['Name_full'].Position = 2
 
-# Insert values fields
-field_values['Min_pay_risk_unsecured'].Orientation = 4
-field_values['Min_pay_risk_unsecured'].Function = -4139
-field_values['Min_pay_risk_unsecured'].NumberFormat = "_($* #,##0.00_);_($* (#,##0.00);_($* -??_);_(@_)"
-
-field_values['Max_pay_risk_unsecured'].Orientation = 4
-field_values['Max_pay_risk_unsecured'].Function = -4136
-field_values['Max_pay_risk_unsecured'].NumberFormat = "_($* #,##0.00_);_($* (#,##0.00);_($* -??_);_(@_)"
+# Insert values field
+field_values['Sum_pay_risk_unsecured'].Orientation = 4
+field_values['Sum_pay_risk_unsecured'].Function = -4157
+field_values['Sum_pay_risk_unsecured'].NumberFormat = "_($* #,##0.00_);_($* (#,##0.00);_($* -??_);_(@_)"
 
 # Adjust column widths
 ws_report.Columns("C:D").ColumnWidth = 15
@@ -94,98 +93,3 @@ ws_report.name = 'PivotTable'
 # Save the modified workbook
 wb.Save()
 
-import pandas as pd
-import sqlalchemy
-import win32com.client as win32
-
-# Set up the database connection
-server = "medissys.bi.dts.corp.local"
-port = 1435
-database = "med_bi"
-driver = "ODBC Driver 13 for SQL Server"
-connection_string = f"mssql+pyodbc://{server}:{port}/{database}?trusted_connection=yes&driver={driver}"
-engine = sqlalchemy.create_engine(connection_string)
-
-# Get Data From Med_bi
-sql_query = "SELECT id_counter, entity, profit_center, Deal#, Quality, Linkage_Execution, date_expo, Deal_date, Credit_due_date, Credit_pty_trf, " \
-            "Linkage#, Credit_Term, Trader, [sale_due_amt $], [purchase_due_amt $],[sale_due_amt $] - [purchase_due_amt $] AS [NET], [Pay_risk $ (pty -8d)], [pay_risk_unsecured (pty-8d)] " \
-            "FROM MED_BI.dbo.credit_phy_deal WHERE Credit_pty_trf BETWEEN '2023-07-01' AND '2023-12-31'"
-df = pd.read_sql(sql_query, engine)
-
-sql_query_2 = "SELECT id_counter, Name_full FROM MED_BI.dbo.COUNTERPARTY"
-df_2 = pd.read_sql(sql_query_2, engine)
-
-df_3 = pd.merge(df, df_2, on='id_counter', how="inner")
-
-df_4 = df_3[(df_3['entity'] == 'ATMI') | (df_3['entity'] == 'TTMC')]
-
-# Group by days (date_expo) and Name_full, find min and max pay_risk_unsecured
-grouped_df = df_4.groupby(['date_expo', 'Name_full'])['pay_risk_unsecured (pty-8d)'].agg(['min', 'max']).reset_index()
-
-# Save grouped data to Excel
-grouped_df.to_excel('exposure_deal.xlsx', index=False)
-
-# Create the Excel application object
-xlApp = win32.Dispatch('Excel.Application')
-xlApp.Visible = True
-
-# Open the workbook
-wb = xlApp.Workbooks.Open(r'C:\Users\SLANCM\PycharmProjects\python_Project_1\exposure_deal.xlsx')
-ws_data = wb.Worksheets(1)
-
-# Convert the table to a real Excel table
-table_range = ws_data.Range(ws_data.Cells(1, 1), ws_data.Cells(grouped_df.shape[0] + 1, grouped_df.shape[1]))
-table = ws_data.ListObjects.Add(1, table_range, 1, 1)
-
-# Change the style of the table
-table.TableStyle = "TableStyleMedium15"
-
-# Format the currency fields in the first sheet
-currency_fields = ['min', 'max']
-for field in currency_fields:
-    column_index = grouped_df.columns.get_loc(field) + 1  # Get the column index (1-based)
-    ws_data.Columns(column_index).NumberFormat = "_($* #,##0.00_);_($* (#,##0.00);_($* -??_);_(@_)"
-
-# Auto-fit the columns in the first sheet
-ws_data.UsedRange.Columns.AutoFit()
-
-# Clear pivot tables on the Report tab
-def clear_pts(ws):
-    for pt in ws.PivotTables():
-        pt.TableRange2.Clear()
-
-# Create the pivot table
-ws_report = wb.Worksheets.Add()
-clear_pts(ws_report)
-pt_cache = wb.PivotCaches().Create(1, ws_data.Range("A1").CurrentRegion)
-pt = pt_cache.CreatePivotTable(ws_report.Range("B3"), "PivotTable1")
-
-# Insert pivot table field settings
-field_rows = {}
-field_rows['Name_full'] = pt.PivotFields("Name_full")
-
-field_values = {}
-field_values['Min_pay_risk_unsecured'] = pt.PivotFields("min")
-field_values['Max_pay_risk_unsecured'] = pt.PivotFields("max")
-
-# Insert row field
-field_rows['Name_full'].Orientation = 1
-field_rows['Name_full'].Position = 1
-
-# Insert values fields
-field_values['Min_pay_risk_unsecured'].Orientation = 4
-field_values['Min_pay_risk_unsecured'].Function = -4139
-field_values['Min_pay_risk_unsecured'].NumberFormat = "_($* #,##0.00_);_($* (#,##0.00);_($* -??_);_(@_)"
-
-field_values['Max_pay_risk_unsecured'].Orientation = 4
-field_values['Max_pay_risk_unsecured'].Function = -4136
-field_values['Max_pay_risk_unsecured'].NumberFormat = "_($* #,##0.00_);_($* (#,##0.00);_($* -??_);_(@_)"
-
-# Adjust column widths
-ws_report.Columns("C:D").ColumnWidth = 15
-
-# Rename the sheet
-ws_report.name = 'PivotTable'
-
-# Save the modified workbook
-wb.Save()
