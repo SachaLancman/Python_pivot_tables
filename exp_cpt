@@ -35,7 +35,7 @@ table_range = ws_data.Range(ws_data.Cells(1, 1), ws_data.Cells(df_3.shape[0] + 1
 table = ws_data.ListObjects.Add(1, table_range, 1, 1)
 
 # Change the style of the table
-table.TableStyle = "TableStyleMedium15"
+table.TableStyle = "TableStyleMedium14"
 
 # Format the currency fields in the first sheet
 currency_fields = ['purchase_due_amt $', 'sale_due_amt $', 'NET', 'Pay_risk $ (pty-8d)', 'pay_risk_unsecured (pty-8d)']
@@ -66,8 +66,8 @@ def insert_pt_field_set1(pt):
     field_rows['Name_full'] = pt.PivotFields("Name_full")
 
     field_values = {}
-    field_values['pay_risk_unsecured (pty-8d)'] = pt.PivotFields("pay_risk_unsecured (pty-8d)")
-    field_values['pay_risk_unsecured (pty-8d)'] = pt.PivotFields("pay_risk_unsecured (pty-8d)")
+    field_values['pay_risk_unsecured_min'] = pt.PivotFields("pay_risk_unsecured (pty-8d)")
+    field_values['pay_risk_unsecured_max'] = pt.PivotFields("pay_risk_unsecured (pty-8d)")
 
     # Insert filter fields
     field_filters['date_expo'].Orientation = 3  # xlPageField
@@ -78,18 +78,18 @@ def insert_pt_field_set1(pt):
     field_rows['Name_full'].Position = 1
 
     # Insert values field
-    field_values['pay_risk_unsecured (pty-8d)'].Orientation = 4
-    field_values['pay_risk_unsecured (pty-8d)'].Function = -4136
-    field_values['pay_risk_unsecured (pty-8d)'].NumberFormat = "_($* #,##0.00_);_($* (#,##0.00);_($* -??_);_(@_)"
+    field_values['pay_risk_unsecured_min'].Orientation = 4
+    field_values['pay_risk_unsecured_min'].Function = -4136
+    field_values['pay_risk_unsecured_min'].NumberFormat = "_($* #,##0.00_);_($* (#,##0.00);_($* -??_);_(@_)"
 
-    field_values['pay_risk_unsecured (pty-8d)'].Orientation = 4
-    field_values['pay_risk_unsecured (pty-8d)'].Function = -4139
-    field_values['pay_risk_unsecured (pty-8d)'].NumberFormat = "_($* #,##0.00_);_($* (#,##0.00);_($* -??_);_(@_)"
+    field_values['pay_risk_unsecured_max'].Orientation = 4
+    field_values['pay_risk_unsecured_max'].Function = -4139
+    field_values['pay_risk_unsecured_max'].NumberFormat = "_($* #,##0.00_);_($* (#,##0.00);_($* -??_);_(@_)"
 
 insert_pt_field_set1(pt1)
 
 # Change pivot table style for the first pivot table
-pt1.TableStyle2 = "PivotStyleDark8"
+pt1.TableStyle2 = "PivotStyleDark7"
 
 # Adjust column widths for the first pivot table
 ws_report1.Columns("D:E").ColumnWidth = 30
