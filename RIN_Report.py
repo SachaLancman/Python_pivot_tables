@@ -3,10 +3,10 @@ import sqlalchemy
 import win32com.client as win32
 
 def create_RIN_report():
-    server = "medissys.bi.dts.corp.local"
-    port = 1435
-    database = "med_bi"
-    driver = "ODBC Driver 13 for SQL Server"
+    server = "xxx"
+    port = xxx
+    database = "xxx"
+    driver = "xxx"
     # driver = "SQL Server"
     connection_string = f"mssql+pyodbc://{server}:{port}/{database}?trusted_connection=yes&driver={driver}"
     engine = sqlalchemy.create_engine(connection_string)
