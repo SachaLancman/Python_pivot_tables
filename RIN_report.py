@@ -19,10 +19,10 @@ last_workday_minus_one = get_last_workday()
 last_workday_minus_one_str = last_workday_minus_one.strftime("%Y-%m-%d")
 
 def create_RIN_report():
-    server = "medissys.bi.dts.corp.local"
-    port = 1435
-    database = "med_bi"
-    driver = "ODBC Driver 13 for SQL Server"
+    server = "xxx"
+    port = xxx
+    database = "xxx"
+    driver = "xxx"
     # driver = "SQL Server"
     connection_string = f"mssql+pyodbc://{server}:{port}/{database}?trusted_connection=yes&driver={driver}"
     engine = sqlalchemy.create_engine(connection_string)
