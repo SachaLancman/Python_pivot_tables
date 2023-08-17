@@ -20,10 +20,10 @@ last_workday_minus_one = get_last_workday()
 last_workday_minus_one_str = last_workday_minus_one.strftime("%Y-%m-%d")
 
 def create_RIN_report():
-    server = "xxx"
-    port = xxx
-    database = "xxx"
-    driver = "xxx"
+    server = "medissys.bi.dts.corp.local"
+    port = 1435
+    database = "med_bi"
+    driver = "ODBC Driver 13 for SQL Server"
     # driver = "SQL Server"
     connection_string = f"mssql+pyodbc://{server}:{port}/{database}?trusted_connection=yes&driver={driver}"
     engine = sqlalchemy.create_engine(connection_string)
@@ -34,8 +34,11 @@ def create_RIN_report():
                 "FROM MED_BI.dbo.credit_phy_deal WHERE date_expo = (SELECT MAX(date_expo) FROM MED_BI.dbo.credit_phy_deal)"
     df = pd.read_sql(sql_query, engine)
 
-    sql_query_2 = "SELECT contract_split, physical_risk, mtm_formula, qty_mtm_open_b, qty_mtm_open_mt, qty_mtm_open_m3, cpt, cpt_grp," \
-                  "cpt_country, cpt_group_country FROM MED_BI.dbo.Tradphys_header_split"
+    # Removing spaces in the column Deal#
+    df['Deal#'] = df['Deal#'].str.replace(' ', '')
+
+    sql_query_2 = "SELECT contract_split, physical_risk, mtm_formula, qty_b, cpt, cpt_grp, date_prop_status," \
+                  "cpt_country, cpt_group_country, [contractual execution] FROM MED_BI.dbo.Tradphys_header_split"
     df_2 = pd.read_sql(sql_query_2, engine)
 
     # Merging both tables
@@ -55,36 +58,54 @@ def create_RIN_report():
     # Add a column to df4 called RIN, keeping the first 6 characters of physical_risk
     df_4['RIN'] = df_4['physical_risk'].apply(lambda x: x[:6])
 
+    # Define a function to calculate the deadline based on the Deal_date month
+    def calculate_deadline(deal_date):
+        if deal_date.month in [1, 2, 3]:
+            return deal_date.replace(month=6, day=1)
+        elif deal_date.month in [4, 5, 6]:
+            return deal_date.replace(month=9, day=1)
+        elif deal_date.month in [7, 8, 9]:
+            return deal_date.replace(month=12, day=1)
+        else:
+            # For October, November, December
+            return deal_date.replace(year=deal_date.year+1 ,month=3, day=31)
+
+    # Apply the function to create the 'Deadline_Rin' column
+    df_4['Deadline_Rin'] = df_4['Deal_date'].apply(calculate_deadline)
+
     # Get RIN D3 data from Medeco
     auth = rkrb.HTTPKerberosAuth(mutual_authentication=rkrb.DISABLED, force_preemptive=True)
-    url_to_call = f"https://api-medeco.dts.corp.local/api/series/mu.RIN_D3_2023A.MLI/values?from={last_workday_minus_one_str}&to={last_workday_minus_one_str}&frequency=2&exclude_na=false"
+    url_to_call = f"https://api-medeco.dts.corp.local/api/series/mu.RIN_D3_2023A.MLI/values?from={last_workday_minus_one_str}&to={last_workday_minus_one_str}&frequency=2&exclude_na=true"
     response = requests.get(url_to_call, auth=auth, verify=False)
     d3 = pd.DataFrame(response.json()['values'])
     d3['RIN'] = 'RIN D3'
 
     # Get RIN D4 data from Medeco
     auth = rkrb.HTTPKerberosAuth(mutual_authentication=rkrb.DISABLED, force_preemptive=True)
-    url_to_call = f"https://api-medeco.dts.corp.local/api/series/mu.RIN_D4_2023A.MLI/values?from={last_workday_minus_one_str}&to={last_workday_minus_one_str}&frequency=2&exclude_na=false"
+    url_to_call = f"https://api-medeco.dts.corp.local/api/series/mu.RIN_D4_2023A.MLI/values?from={last_workday_minus_one_str}&to={last_workday_minus_one_str}&frequency=2&exclude_na=true"
     response = requests.get(url_to_call, auth=auth, verify=False)
     d4 = pd.DataFrame(response.json()['values'])
     d4['RIN'] = 'RIN D4'
 
     # Get RIN D5 data from Medeco
     auth = rkrb.HTTPKerberosAuth(mutual_authentication=rkrb.DISABLED, force_preemptive=True)
-    url_to_call = f"https://api-medeco.dts.corp.local/api/series/mu.RIN_D5_2023A.MLI/values?from={last_workday_minus_one_str}&to={last_workday_minus_one_str}&frequency=2&exclude_na=false"
+    url_to_call = f"https://api-medeco.dts.corp.local/api/series/mu.RIN_D5_2023A.MLI/values?from={last_workday_minus_one_str}&to={last_workday_minus_one_str}&frequency=2&exclude_na=true"
     response = requests.get(url_to_call, auth=auth, verify=False)
     d5 = pd.DataFrame(response.json()['values'])
     d5['RIN'] = 'RIN D5'
 
     # Get RIN D6 data from Medeco
     auth = rkrb.HTTPKerberosAuth(mutual_authentication=rkrb.DISABLED, force_preemptive=True)
-    url_to_call = f"https://api-medeco.dts.corp.local/api/series/mu.RIN_D6_2023A.MLI/values?from={last_workday_minus_one_str}&to={last_workday_minus_one_str}&frequency=2&exclude_na=false"
+    url_to_call = f"https://api-medeco.dts.corp.local/api/series/mu.RIN_D6_2023A.MLI/values?from={last_workday_minus_one_str}&to={last_workday_minus_one_str}&frequency=2&exclude_na=true"
     response = requests.get(url_to_call, auth=auth, verify=False)
     d6 = pd.DataFrame(response.json()['values'])
     d6['RIN'] = 'RIN D6'
 
     # Merge all dataframes on RIN with pd.merge
     dfx = pd.concat([d3, d4, d5, d6], ignore_index=True)
+
+    # Convert 'value' column to numeric
+    dfx['value'] = pd.to_numeric(dfx['value'])
 
     # add a column "Market_price_RIN_B" =  'value' * 42 (gallon to BBL)
     dfx['Market_price_RIN_B'] = dfx['value'] * 42 / 100
@@ -101,8 +122,8 @@ def create_RIN_report():
     # Merge df_4 and dfx
     df_4 = pd.merge(df_4, dfx, on='RIN', how="inner")
 
-    # Add a column "Market_price" = Market_price_RIN_B * Quantity
-    df_4['Market_price'] = df_4['Market_price_RIN_B'] * df_4['Quantity']
+    # Add a column "Market_price" = Market_price_RIN_B * qty_b
+    df_4['Market_price'] = df_4['Market_price_RIN_B'] * df_4['qty_b']
 
     # Add a column "MTM_purchase_gbl" = Market_price - purchase_gbl_amt $ when purchase_gbl_amt $ is not 0
     df_4['MTM_purchase_gbl'] = df_4.apply(
@@ -118,7 +139,10 @@ def create_RIN_report():
     df_4['MTM_sale_gbl'].fillna(0, inplace=True)
 
     # Add a "MTM_NET" column = MTM_sale_gbl - MTM_purchase_gbl
-    df_4['MTM_NET'] = df_4['MTM_sale_gbl'] - df_4['MTM_purchase_gbl']
+    df_4['MTM_NET'] = df_4['MTM_sale_gbl'] + df_4['MTM_purchase_gbl']
+
+    # Add "performance_risk" column = MTM_NET when MTM_NET > 0, 0 otherwise
+    df_4['performance_risk'] = df_4.apply(lambda row: row['MTM_NET'] if row['MTM_NET'] > 0 else 0, axis=1)
 
     # Save table to Excel
     df_4.to_excel('auto_rin.xlsx', index=False)
@@ -141,7 +165,7 @@ def create_RIN_report():
     # Format the currency fields in the first sheet
     currency_fields = ['purchase_due_amt $', 'sale_due_amt $', 'NET', 'Pay_risk $ (pty -8d)', 'Pay_risk_secured $ (pty-8d)',
                        'Unit price$', 'purchase_gbl_amt $', 'sale_gbl_amt $', 'Market_price_RIN_gal', 'Market_price_RIN_B',
-                       'Market_price', 'MTM_purchase_gbl', 'MTM_sale_gbl', 'MTM_NET']
+                       'Market_price', 'MTM_purchase_gbl', 'MTM_sale_gbl', 'MTM_NET', 'performance_risk']
     for field in currency_fields:
         column_index = df_4.columns.get_loc(field) + 1  # Get the column index (1-based)
         ws_data.Columns(column_index).NumberFormat = "_($* #,##0.00_);_($* (#,##0.00);_($* -??_);_(@_)"
